@@ -1,20 +1,21 @@
 import java.util.*;
 import java.io.*;
+import java.io.IOException.*;
 
 
 /*
 2,3,4,5,6,7,8,10,11,14,22,23,24,28,30,36,39
 */
 class AlterData{
-	public static void main(String[] args){
-
+	public void alteringData() throws IOException{
+		//Modifying the original data set in order to work with some features
 		modifyData("KDDTrain+.csv");
 		modifyData("KDDTest+.csv");
 
 	}	
 
-	public static void modifyData(String fileName){
-				File file = new File(fileName);
+	public void modifyData(String fileName) throws IOException{
+		File file = new File(fileName);
 		FileReader fr = null;
 		BufferedReader br = null;
 		int protocolCounter = 0;
@@ -28,6 +29,8 @@ class AlterData{
 
 		int classificationCounter=0;
 		HashMap<String, Integer> classification = new HashMap<String, Integer>();
+		classification.put("normal",0);
+		classification.put("intrusion", 1);
 
 		FileWriter fw = null;
 		BufferedWriter bw = null;
@@ -38,7 +41,7 @@ class AlterData{
 			fr = new FileReader(file);
 			br = new BufferedReader(fr);
 	
-			
+			//Labeling the String values and assigning them a int value 
 			while((line=br.readLine())!=null){
 				String data[] = line.split(delimiter);
 				if(!protocol.containsKey(data[1].trim())){
@@ -52,14 +55,13 @@ class AlterData{
 					flag.put(data[3], ++flagCounter);
 				}
 
-				if(!classification.containsKey(data[41].trim())){
-					classification.put(data[41], ++classificationCounter);
-				}
 			}
 			fw= new FileWriter(new File("Modified"+fileName));
 			bw = new BufferedWriter(fw);
 			fr = new FileReader(file);
 			br = new BufferedReader(fr);
+
+			//Creating a new training and test data sets
 			while((line=br.readLine())!=null){
 				String data[] = line.split(delimiter);
 				fw.append(Integer.toString(protocol.get(data[1].trim())));
@@ -96,32 +98,21 @@ class AlterData{
 				fw.append(delimiter);
 				fw.append(data[38].trim());
 				fw.append(delimiter);
-				fw.append(Integer.toString(classification.get(data[41].trim())));
+				if(data[41].trim().equalsIgnoreCase("normal")){
+					fw.append(Integer.toString(classification.get("normal")));	
+				}else{
+					fw.append(Integer.toString(classification.get("intrusion")));	
+				}
 				fw.append(delimiter);
 				fw.append("\n");
 			}
 		} catch(Exception e){
 			e.printStackTrace();
+		} finally{
+			fw.close();
+			fr.close();
+			br.close();
 		}
 
-		System.out.println("\nProtocol");
-		for(String key : protocol.keySet()){
-			System.out.println(key +"-->"+ protocol.get(key));
-		}
-
-		System.out.println("\nService");
-		for(String key : service.keySet()){
-			System.out.println(key +"-->"+ service.get(key));
-		}
-
-		System.out.println("\nFlag");
-		for(String key : flag.keySet()){
-			System.out.println(key +"-->"+ flag.get(key));
-		}
-
-		System.out.println("\nclassification");
-		for(String key : classification.keySet()){
-			System.out.println(key +"-->"+ classification.get(key));
-		}
 	}
 }

@@ -31,11 +31,6 @@ class IDS:
 				data_train.append(row)
 
 
-		#label.append(float(new_list[-1]))
-		#print len(data_train)
-		#print len(label_train)
-		#print len(label)
-
 		data_test = []
 		label_test = []
 		with open("ModifiedKDDTest+.csv","r") as f:
@@ -63,6 +58,17 @@ class IDS:
   		self.label_test = label_test
 	  	decisionTree = tree.DecisionTreeClassifier()
 	  	decisionTree = decisionTree.fit(self.train_data_features,self.label_train)
+	  	predict=decisionTree.predict(self.train_data_features)
+	  	accuracy=decisionTree.score(self.train_data_features,self.label_train)
+	  	print "-----------------------------Training Data Results-----------------------------"
+	  	print "Accuracy for Decision trees:", accuracy
+	  	print "Confusion Matrix:", confusion_matrix(self.label_train, predict)
+
+	  	dot_data = tree.export_graphviz(decisionTree, out_file=None) 
+	  	graph = pydotplus.graph_from_dot_data(dot_data) 
+	  	graph.write_pdf("TrainingSet.pdf")
+
+	  	print "-----------------------------Test Data Results-----------------------------"
 	  	predict=decisionTree.predict(self.test_data_features)
 	  	accuracy=decisionTree.score(self.test_data_features,self.label_test)
 	  	print "Accuracy for Decision trees:", accuracy
@@ -70,6 +76,6 @@ class IDS:
 
 	  	dot_data = tree.export_graphviz(decisionTree, out_file=None) 
 	  	graph = pydotplus.graph_from_dot_data(dot_data) 
-	  	graph.write_pdf("IDS.pdf")
+	  	graph.write_pdf("TestSet.pdf")
 
 IDS()
